@@ -16,7 +16,7 @@ def send_confirmation_email(email , code):
     send_mail(
         subject,
         plain_message,
-        'mp3_club@gmail.com',
+        'ITInterHub@gmail.com',
         [email],
         html_message=html_message,
         fail_silently=False
@@ -26,7 +26,7 @@ def send_confirmation_password(email,code):
     send_mail(
             'Подтвердите ваше изменение',
             f'Ваш код подтверждение: {code}',
-            'mp3_club@gmail.com',
+            'ITInternHub@gmail.com',
             [email],
             fail_silently=False,
         )
