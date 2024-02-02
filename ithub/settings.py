@@ -44,13 +44,15 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'dj_rest_auth',
-    # 'cachalot',
-    # 'django_celery_results',
-    # 'drf_api_logger',
-
-
+    'cachalot',
+    'django_celery_results',
+    'drf_api_logger',
+    'news',
+    'post',
     'account',
-
+    'vacancies',
+    'company',
+    'home',
 ]
 
 MIDDLEWARE = [
@@ -68,7 +70,7 @@ ROOT_URLCONF = 'ithub.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -94,7 +96,7 @@ DATABASES = {
         'USER':config('USER'),
         'PASSWORD':config('PASSWORD'),
         'HOST':'127.0.0.1',
-        'POSRT':'5432'
+        'PORT':'5432'
     }
 }
 
@@ -123,7 +125,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Bishkek'
 
 USE_I18N = True
 
@@ -133,7 +135,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -143,6 +145,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
 
 
 
@@ -174,3 +185,67 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
 
+
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = '6379'
+
+#Celery setting
+CELERY_BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+# CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+
+
+#Celery result
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
+CELERY_CACHE_BACKEND_OPTIONS = {
+    'max_entries': 1000,
+    'cull_frequency': 3,
+}
+
+
+
+
+
+
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+
+    "formatters": {
+        "main_format": {
+            "format": "[{asctime}-{levelname}] {module}-{filename}: {message}",
+            "style": "{",
+        }
+    },
+
+    'handlers': {
+        'console': {'class': 'logging.StreamHandler',
+                    'formatter': 'main_format'},
+        'file': {
+            'class': 'logging.FileHandler',
+            'formatter': 'main_format',
+            'filename': '/home/yimanbek/Desktop/hackaton project/log.log',
+        }
+    },
+
+    'loggers': {
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG'
+        },
+        'product': {
+            'handlers': ['file'],
+            'level': 'WARNING'
+        }
+    }
+}
+
+
+DRF_API_LOGGER_DATABASE = True

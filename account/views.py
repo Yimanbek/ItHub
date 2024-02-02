@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView , get_object_or_404,ListAPIView
 from django.contrib.auth import get_user_model,authenticate, login
 from rest_framework import permissions
-from .send_email import send_confirmation_email,send_confirmation_password
+from ithub.tasks import send_confirmation_email_task,send_confirmation_password_task
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from django.contrib import messages
@@ -26,14 +26,14 @@ class RegistrationView(APIView):
     def post(self, request):
         serializer = RegistrationSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save(hv_company=True if request.data.get('hv_company',False) == 'on' else False)
+            user = serializer.save()
             if user:
                 try:
-                    send_confirmation_email(user.email, user.activation_code)
+                    send_confirmation_email_task(user.email, user.activation_code)
                     return redirect('dashboard')
                 except:
-                    return Response({'message': "Зарегистрировался, но на почту код не отправился", 'data': serializer.data}, status=201)
-            return Response({'message': 'User registered successfully'}, status=201)
+                    return render(request,self.templates_name,{'error': serializer.errors})
+            return render(request,self.templates_name,{'error': serializer.errors})
         else:
             return render(request, self.templates_name, {'error': serializer.errors})
 
@@ -54,6 +54,8 @@ class DashboardView(View):
             return redirect('login')
         elif action == 'register':
             return redirect('registration')
+        elif action == 'home':
+            return redirect('home')
         else:
             error_message = 'Invalid action'
             return render(request, self.templates_name, {'error': error_message})
@@ -79,7 +81,7 @@ class LoginView(View):
             token, created = Token.objects.get_or_create(user=user)
 
             if token:
-                return redirect('dashboard')
+                return redirect('home')
             else:
                 return redirect('login')
         else:
@@ -123,7 +125,7 @@ class ResetView(APIView):
         password_change_code = user.create_number_code()
         user.password_change_code = password_change_code
         user.save()
-        send_confirmation_password(user.email,password_change_code)
+        send_confirmation_password_task(user.email,password_change_code)
 
         return redirect('reset_password_2')
     
@@ -150,3 +152,12 @@ class ResetPasswordView(View):
             return redirect('login')
 
         return render(request, self.template_name, {'error': serializer.errors})
+
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+from django.views import View  # Import View from django.views
+
+class LogoutView(View):  # Inherit from View
+    def post(self, request):
+        logout(request)
+        return redirect('home')  # Replace 'home' with the appropriate URL name
