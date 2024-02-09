@@ -1,4 +1,3 @@
-<!-- templates/create_news.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,7 +21,7 @@
         }
 
         nav {
-            background-color: #f8f9fa; /* Bootstrap bg-light color */
+            background-color: #f8f9fa;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             padding: 10px;
             width: 100%;
@@ -37,9 +36,13 @@
 
         nav a {
             text-decoration: none;
-            color: #000; /* Set color to black */
+            color: #000;
             margin: 0 15px;
             font-size: 16px;
+        }
+
+        .navbar-toggler-icon {
+            color: #007BFF;
         }
 
         body {
@@ -58,7 +61,8 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 400px;
+            width: 100%; /* Occupy 100% width of the viewport */
+            max-width: 400px; /* Set maximum width to avoid stretching on large screens */
             margin: auto;
         }
 
@@ -141,7 +145,6 @@
     </nav>
     <a href="{% url 'news_list' %}" class="back-button">Back</a>
 
-
     <form method="post" enctype="multipart/form-data" action="{% url 'post_news' %}">
         {% if error %}
             <p class="error-message">{{ error }}</p>
@@ -167,5 +170,7 @@
 
         <button type="submit">Create News</button>
     </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

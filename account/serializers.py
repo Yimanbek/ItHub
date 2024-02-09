@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate
+from .models import CustomUser
 User = get_user_model()
 
 
@@ -50,6 +52,7 @@ class ActivationSerializer(serializers.Serializer):
 
 
 class ResetPasswordSerializer(serializers.ModelSerializer):
+    # email = serializers.EmailField()
     password = serializers.CharField(min_length=6, max_length=20, required=True, write_only=True)
     password_confirmation = serializers.CharField(min_length=6, max_length=20, required=True, write_only=True)
     password_change_code = serializers.CharField(write_only=True, required=True)
@@ -60,19 +63,23 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         password = attrs['password']
-        password_confirmation = attrs['password_confirmation']
-        password_change_code = attrs['password_change_code']
+        password_confirmation = attrs.pop('password_confirmation')
+        password_change_code = attrs.pop('password_change_code')
 
         if password != password_confirmation:
-            raise serializers.ValidationError('Пароли должны совпадать')
-
-        if not (any(char.isdigit() for char in password) and any(char.isalpha() for char in password)):
-            raise serializers.ValidationError('Пароль должен содержать буквы и цифры')
-
-        instance = self.instance
-        if instance and instance.password_change_code != password_change_code:
-            raise serializers.ValidationError('Неверный код изменения пароля')
-
+            raise serializers.ValidationError(
+                'Passwords must match'
+            )
+        
+        if password.isdigit() or password.isalpha():
+            raise serializers.ValidationError(
+                'The password must contain letters and numbers'
+            )
+        
+        if self.instance.password_change_code != password_change_code:
+            raise serializers.ValidationError(
+                'Invalid password change code'
+            )
         return attrs
 
     def update(self, instance, validated_data):
@@ -80,3 +87,4 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
         instance.password_change_code = ''
         instance.save()
         return instance
+    

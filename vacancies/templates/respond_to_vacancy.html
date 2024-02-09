@@ -142,7 +142,6 @@
         </div>
     </nav>
     <div class="response-form">
-
         <form method="post" action="{% url 'respond_to_vacancy' vacancy.id %}">
             {% csrf_token %}
             <input type="hidden" name="user_token" value="{{ user_token }}">

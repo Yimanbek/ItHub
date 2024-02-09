@@ -1,23 +1,38 @@
-from django.shortcuts import render , redirect, get_object_or_404
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
-from .serializers import VacanciesSerializer,VacanciesDetailSerializer
+from .serializers import VacanciesSerializer, VacanciesDetailSerializer,VacanciesListSerializer
 from rest_framework import permissions
 from .models import Vacancies
-from account.permissions import IsAuthor
-from django.http import Http404,HttpResponse
+from account.permissions import IsAuthor,IsAuthorOrAdmin
+from django.http import Http404, HttpResponse
 from ithub.tasks import send_respond_data_task
+from django.contrib.auth.decorators import login_required
+from rest_framework.pagination import PageNumberPagination
+from drf_yasg.utils import swagger_auto_schema
+
+
+class StandartPaginational(PageNumberPagination):
+    page_size = 20
+    page_query_param = 'page'
+    def get_paginated_response(self,data):
+        return Response({
+            'links':{
+                'next':self.get_next_link(),
+                'previous':self.get_previous_link(),
+            },
+            'count':self.page.paginator.count,
+            'results':data
+        })
+    
 
 class VacanciesCreateView(APIView):
-    authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        return render(request, 'create_vacancies.html')  
-    
+    @swagger_auto_schema(request_body=VacanciesSerializer)
     def post(self, request):
         try:
             serializer = VacanciesSerializer(data=request.data)
@@ -27,20 +42,17 @@ class VacanciesCreateView(APIView):
                         serializer.validated_data['owner'] = request.user.company
                         user = serializer.save()
                         if user:
-                            
-                            return redirect('vacancy_view')
+                            return Response({'message': 'Your request was saved successfully!', 'vacancy_id': user.id})
                         else:
-                            return render(request,'create_vacancies.html',{'error': 'Your request didn\'t save!'})
+                            return Response({'error': 'Your request didn\'t save!'})
                     else:
-                        return render(request,'create_vacancies.html',{'error': 'You don\'t have the necessary permissions!'})
+                        return Response({'error': 'You don\'t have the necessary permissions!'})
                 except Exception as e:
-                    return render(request,'create_vacancies.html',{'error': f'An error occurred: {str(e)}'})
+                    return Response({'error': f'An error occurred: {str(e)}'})
             else:
-                return render(request,'create_vacancies.html',{'error': 'Invalid data'})
+                return Response({'error': 'Invalid data'})
         except Exception as e:
-            return render(request, 'create_vacancies.html', {'error': str(e)})
-
-
+            return Response({'error': str(e)})
 
 
 class VacanciesDetailDestroy(APIView):
@@ -56,31 +68,48 @@ class VacanciesDetailDestroy(APIView):
 
     def get(self, request, pk):
         vacancy = self.get_object(pk)
-        return render(request,'vacancy.html',{'vacancy':vacancy})
+        serializer = VacanciesDetailSerializer(vacancy)
+        return Response(serializer.data)
+    
+    def delete(self,request,pk):
+        try:
+            vacancy = get_object_or_404(Vacancies,id=pk)
+            if request.user == vacancy.owner.owner:
+                vacancy.delete()
+                return Response({'message':'Vacancy is delete!'})
+            return Response({'error':'You don\'t have permissions for del'})
+        except Exception as e:
+            return Response({'error': f'An error occurred: {str(e)}'})
 
 
-def get_object_vac(request):
-    template_name = 'vacancies_view.html'
-    vacancies = Vacancies.objects.all()
-    return render(request,template_name,{'vacancies':vacancies})
 
-from django.contrib.auth.decorators import login_required
+class Get_object_vac(ModelViewSet):
+    queryset = Vacancies.objects.all()
+    pagination_class = StandartPaginational
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return VacanciesListSerializer
+        elif self.action in ('create','update','partial_update'):
+            return VacanciesSerializer
+        return VacanciesDetailSerializer
 
 
-@login_required
-def respond_to_vacancy(request, vacancy_id):
-    vacancy = get_object_or_404(Vacancies, pk=vacancy_id)
+class ResponseToVacancyView(APIView):
+    permission_classes = [IsAuthenticated]
 
-    if request.method == 'POST':
-        full_name = request.POST.get('full_name')
-        characteristics = request.POST.get('characteristics')
-        phone_number = request.POST.get('phone_number')
-        email = request.POST.get('email')
-        short_intro = request.POST.get('short_intro')
-        additional_info = request.POST.get('additional_info')
+    def post(self,request,vacancy_id):
+        vacancy = get_object_or_404(Vacancies, pk=vacancy_id)
+        if request.method == 'POST':
+            full_name = request.POST.get('full_name')
+            characteristics = request.POST.get('characteristics')
+            phone_number = request.POST.get('phone_number')
+            email = request.POST.get('email')
+            short_intro = request.POST.get('short_intro')
+            additional_info = request.POST.get('additional_info')
 
-        send_respond_data_task(full_name, characteristics, phone_number, email, short_intro, additional_info, vacancy.owner.owner)
+            send_respond_data_task(full_name, characteristics, phone_number, email, short_intro, additional_info, vacancy.owner.owner)
 
-        return redirect('vacancy', pk=vacancy.id)
-    else:
-        return render(request, 'respond_to_vacancy.html', {'vacancy': vacancy})
+            return Response({'message': 'Your response has been sent successfully!'})
+        else:
+            serializer = VacanciesDetailSerializer(vacancy)
+            return Response({'message': 'Successfully retrieved'})

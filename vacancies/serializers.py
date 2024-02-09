@@ -8,9 +8,24 @@ class VacanciesSerializer(serializers.ModelSerializer):
         model = Vacancies
         fields = ('owner','title','description','requirement','schedule','salary')
 
+
+
+
+
+
+
+
+
 class VacanciesDetailSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.email')
+    owner = serializers.ReadOnlyField(source='owner.name')
 
     class Meta:
         model = Vacancies
         fields = ['owner', 'title','description','requirement','schedule','salary']
+
+class VacanciesListSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source = 'owner.name')
+
+    class Meta:
+        model = Vacancies
+        fields = ('id','owner','title','description','requirement','schedule','salary')

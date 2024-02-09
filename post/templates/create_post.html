@@ -1,4 +1,3 @@
-<!-- templates/create_post.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,6 +27,10 @@
             font-weight: bold;
         }
 
+        .navbar-toggler-icon {
+            color: #007BFF; /* Toggler color */
+        }
+
         h1 {
             color: #333;
             margin-top: 20px;
@@ -35,7 +38,7 @@
 
         form {
             margin-top: 20px;
-            max-width: 400px; /* Set max-width for responsiveness */
+            max-width: 600px; /* Set max-width for responsiveness */
             margin-left: auto;
             margin-right: auto;
         }
@@ -76,21 +79,8 @@
             margin-bottom: 20px;
             font-size: 18px;
         }
+        
     </style>
-    <script>
-        // Simple JavaScript form validation (can be improved as needed)
-        function validateForm() {
-            const title = document.getElementById('title').value;
-            const content = document.getElementById('content').value;
-
-            if (title.trim() === '' || content.trim() === '') {
-                alert('Please fill in all fields.');
-                return false;
-            }
-
-            return true;
-        }
-    </script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg bg-white sticky-top navbar-light shadow-sm">
@@ -136,5 +126,6 @@
         <input type="submit" value="Create Post">
     </form>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
