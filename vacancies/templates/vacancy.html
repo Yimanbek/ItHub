@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vacancy Detail</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        nav{
+            width: 100%;
+        }
+        .navbar {
+            background-color: #f8f9fa;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+        }
+
+        .navbar-brand {
+            color: #007BFF;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .navbar-nav {
+            margin-top: 10px;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-y: auto;
+            color: #000000; /* Changed text color to black for better visibility */
+        }
+
+        header {
+            background-color: #ffffff;
+            color: #333333; /* Adjusted text color for better visibility */
+            padding: 10px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .detail-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            width: 80%;
+            max-width: 900px;
+            margin: 20px auto;
+            overflow: hidden;
+            position: relative;
+            color: hwb(0 100% 0%); /* Adjusted text color for better visibility */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-group {
+            margin-bottom: 20px;
+            flex-grow: 1;
+            border: 2px solid #585858;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .detail-group label {
+            display: block;
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #000000; /* Adjusted label color for better visibility */
+        }
+
+        .detail-group p {
+            font-size: 16px;
+            color: #000000; /* Adjusted text color for better visibility */
+            overflow: hidden;
+        }
+
+        .respond-button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: fit-content;
+            align-self: flex-end;
+            transition: all 0.3s ease-in-out;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: auto;
+        }
+
+        .respond-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-white sticky-top navbar-light shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}"><i class="fa-solid fa-shop me-2"></i><strong>IT-internHUB</strong></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+    
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'index' %}">Реддит</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'news_list' %}">Мероприятия</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'companies' %}">Организации</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://t.me/+x32bgUZeSA83MGE6">Сообщество</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://t.me/Project2_botbot">ChatGPT</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="detail-container">
+        {% if vacancy %}
+            <a href="{% url 'respond_to_vacancy' vacancy.id %}" class="respond-button">Respond to Vacancy</a>
+            <div class="detail-group">
+                <label>Title:</label>
+                <p>{{ vacancy.title }}</p>
+            </div>
+            <div class="detail-group">
+                <label>Description:</label>
+                <p>{{ vacancy.description }}</p>
+            </div>
+            <div class="detail-group">
+                <label>Requirements:</label>
+                <p>{{ vacancy.requirement }}</p>
+            </div>
+            <div class="detail-group">
+                <label>Schedule:</label>
+                <p>{{ vacancy.schedule }}</p>
+            </div>
+            <div class="detail-group">
+                <label>Salary:</label>
+                <p>{{ vacancy.salary }}</p>
+            </div>
+            <div class="detail-group">
+                <label>Owner:</label>
+                <p>{{ vacancy.owner.owner }}</p>
+            </div>
+        {% else %}
+            <p>Vacancy not found.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

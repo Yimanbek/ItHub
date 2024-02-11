@@ -40,8 +40,7 @@ class CustomUser(AbstractUser):
     is_active = models.BooleanField(default=False, help_text='This field is to activate the user')
     activation_code = models.CharField(max_length=255, blank=True)
     password_change_code = models.CharField(max_length=255, blank=True)
-    hv_company = models.BooleanField(default=False)
-    
+
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
