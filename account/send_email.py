@@ -16,7 +16,9 @@ def send_confirmation_email(email , code):
     send_mail(
         subject,
         plain_message,
+
         'ITInternHub@gmail.com',
+
         [email],
         html_message=html_message,
         fail_silently=False
@@ -31,7 +33,6 @@ def send_confirmation_password(email,code):
             [email],
             fail_silently=False,
         )
-    
 
 
 def send_respond_data(full_name, characteristics, phone_number, email, short_intro, additional_info, owner_email):
@@ -57,3 +58,4 @@ def send_comment_notification(post_author,content,email_from):
     recipient_list = [post_user.author.email]
 
     send_mail(subject, message, from_email, recipient_list)
+
