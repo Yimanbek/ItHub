@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #292b2c;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .dashboard-container {
+            background-color: #343a40;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            width: 300px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #fff;
+        }
+
+        .dashboard-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .dashboard-buttons button {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .dashboard-buttons button:hover {
+            background-color: #218838;
+        }
+
+        .welcome-message {
+            margin-top: 20px;
+            color: #fff;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h2>ItInternHub</h2>
+        {% if user.is_authenticated %}
+            <p class="welcome-message">Welcome, {{ user.first_name }}! You are logged in.</p>
+        {% else %}
+            <div class="dashboard-buttons">
+                <form method="post" action="{% url 'dashboard' %}">
+                    {% csrf_token %}
+                    <button type="submit" name="action" value="login">Login</button>
+                </form>
+                <form method="post" action="{% url 'dashboard' %}">
+                    {% csrf_token %}
+                    <button type="submit" name="action" value="register">Register</button>
+                </form>
+                <form method="post" action="{% url 'home' %}">
+                    {% csrf_token %}
+                    <button type="submit" name="action" value="register">Home</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

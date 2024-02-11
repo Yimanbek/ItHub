@@ -73,6 +73,10 @@
                     {% csrf_token %}
                     <button type="submit" name="action" value="register">Register</button>
                 </form>
+                <form method="post" action="{% url 'home' %}">
+                    {% csrf_token %}
+                    <button type="submit" name="action" value="register">Home</button>
+                </form>
             </div>
         {% endif %}
     </div>
