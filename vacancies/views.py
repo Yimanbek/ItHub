@@ -83,15 +83,11 @@ class VacanciesDetailDestroy(APIView):
 
 
 
-class Get_object_vac(ModelViewSet):
-    queryset = Vacancies.objects.all()
-    pagination_class = StandartPaginational
-    def get_serializer_class(self):
-        if self.action == 'list':
-            return VacanciesListSerializer
-        elif self.action in ('create','update','partial_update'):
-            return VacanciesSerializer
-        return VacanciesDetailSerializer
+class Get_object_vac(APIView):
+    def get(self,request):
+        vacancies = Vacancies.objects.all()
+        serializer = VacanciesListSerializer(instance = vacancies,many = True)
+        return Response(serializer.data)
 
 
 class ResponseToVacancyView(APIView):
