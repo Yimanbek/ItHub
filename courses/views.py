@@ -31,7 +31,17 @@ class CoursesDetailView(APIView):
             return Response({'success': True, 'courses': serializer.data})
         except Exception as e:
             return Response({'success': False, 'message': f'An error occurred: {str(e)}'})
-        
+
+            
+    def delete(self, request,id):
+        try:
+            courses = get_object_or_404(Courses, id=id)
+            if request.user == courses.owner :
+                courses.delete()
+                return Response({'message': 'Course is dellete'})
+            return Response({'error': 'You dont have permissions for delete this course'})
+        except Exception as e :
+            return Response ({'error': f'ERROR OCCURRED:{str(e)}'})
 
 class CoursesListView(APIView):
     def get(self, request):

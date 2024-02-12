@@ -79,7 +79,13 @@ class PostDetailView(APIView):
         }
         
         return Response(data, status=200)
-
+    
+    def delete(self,request,post_id):
+        post = get_object_or_404(Post,id=post_id)
+        if post.author == request.user:
+            post.delete()
+            return Response({'message':'Your post is delete!'})
+        return Response({'error':'You are not author this post'})
 
 class CreatePostView(APIView):
     permission_classes = [IsAuthenticated]
