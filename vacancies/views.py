@@ -96,12 +96,12 @@ class ResponseToVacancyView(APIView):
     def post(self,request,vacancy_id):
         vacancy = get_object_or_404(Vacancies, pk=vacancy_id)
         if request.method == 'POST':
-            full_name = request.POST.get('full_name')
-            characteristics = request.POST.get('characteristics')
-            phone_number = request.POST.get('phone_number')
-            email = request.POST.get('email')
-            short_intro = request.POST.get('short_intro')
-            additional_info = request.POST.get('additional_info')
+            full_name = request.data.get('full_name')
+            characteristics = request.data.get('characteristics')
+            phone_number = request.data.get('phone_number')
+            email = request.data.get('email')
+            short_intro = request.data.get('short_intro')
+            additional_info = request.data.get('additional_info')
 
             send_respond_data_task(full_name, characteristics, phone_number, email, short_intro, additional_info, vacancy.owner.owner)
 
