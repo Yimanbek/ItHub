@@ -77,8 +77,8 @@ class DashboardView(View):
 class LoginView(APIView):
     
     def post(self, request):
-        email = request.POST.get('email')
-        password = request.POST.get('password')
+        email = request.data.get('email')
+        password = request.data.get('password')
 
         if not email or not password:
             return Response({'error': 'Email and Password are required!'}, status=status.HTTP_400_BAD_REQUEST)
